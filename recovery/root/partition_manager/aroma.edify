@@ -1,0 +1,154 @@
+# set default colourspace
+ini_set("force_colorspace", "rgba");
+
+# set dp size
+ini_set("dp", "3");
+
+# set theme and font
+theme("materialize_indigo");
+fontresload("0", "fonts/Roboto-Light.ttf;", "10");  #-- General text
+fontresload("1", "fonts/Roboto-Light.ttf;", "14");  #-- Title text
+
+# set device from ro.product.device prop, abort if not possible
+setvar("device", sysprop("ro.product.device"));
+if (getvar("device") != "mblu2") then
+	# something wrong with this device/recovery
+	ini_set("text_next", "Exit");
+	ini_set("icon_next", "");
+	textbox(
+		"Error",
+		"Wrong device",
+		"@warning",
+		"This is only for mblu2 (Meizu M2) device."
+	);
+	exit("");
+endif;
+
+# extract common files
+ziptotmp("changelog.txt", "changelog.txt");
+ziptotmp("disclaimer.txt", "disclaimer.txt");
+ziptotmp("credits.txt", "credits.txt");
+
+###################
+### Main menu
+###################
+
+gotolabel("start");
+ini_set("text_next", "Next");
+ini_set("icon_next", "@next");
+
+# gather information about existing partition map
+# Not necessary, happens in a split second
+setvar("partition_status", exec("/sbin/sh", "/partition_manager/get_partition_status.sh"));
+setvar("partition_status_text", "Unrecognized");
+if (getvar("partition_status") == 1) then
+	setvar("partition_status_text", "Stock");
+endif;
+if (getvar("partition_status") == 2) then
+	setvar("partition_status_text", "Treble");
+endif;
+
+menubox(
+	"Welcome to Partition Manager!",
+	"Detected Device: <b>" + getvar("device") + "</b>\n" +
+	"Detected partition map: " + getvar("partition_status_text"),
+	"@home",
+	"choice_main_menu.prop",
+	"Repartition", "Repartition device", "@chip",
+	"Changelog", "View changelog for this version", "@changelog",
+	"Credits", "See thanks and credits", "@credits",
+	"Exit", "Exit and return to Recovery", "@exit"
+);
+
+###################
+### Repartition
+###################
+
+if prop("choice_main_menu.prop", "selected") == "1" then
+	# Partitions
+	form(
+		"Repartition",
+		"Choose partition table.",
+		"@chip",
+		"choice_repartition.prop",
+		"treble20", "Treble(2G System)", "Rename custom to vendor and resize system to 2G", "select",
+		"treble25", "Treble(2.5G System)", "Rename custom to vendor and resize system to 2.5G", "select.selected",
+		"treble30", "Treble(3G System)", "Rename custom to vendor and resize system to 3G", "select",
+		"treble35", "Treble(3.5G System)", "Rename custom to vendor and resize system to 3.5G", "select",
+		"treble40", "Treble(4G System)", "Rename custom to vendor and resize system to 4G", "select",
+		"stock", "Stock", "Rename vendor to custom and resize system to 1.5G", "select"
+	);
+
+	ini_set("text_next", "Repartition");
+	ini_set("icon_next", "@next");
+
+	agreebox(
+		"Repartition for Treble",
+		getvar("partition_subtitle"),
+		"@warning",
+		"\n\n<#c00><b>This will COMPLETELY WIPE your USERDATA, including INTERNAL STORAGE, so make sure you have backed up anything you want to keep!</b></#>\n\n\n" +
+		"Please check the box below to confirm.",
+		"I wish to repartition this device",
+		"Check the box to confirm!"
+	);
+endif;
+
+###################
+### Changelog and Credits
+###################
+
+if prop("choice_main_menu.prop","selected")=="2" then
+	ini_set("text_next", "Return  ");
+	ini_set("icon_next", "@home");
+	textbox(
+		"Changelog",
+		"Changelog up to this version",
+		"@changelog",
+		read("/tmp/aroma/changelog.txt")
+	);
+	goto("start");
+endif;
+
+if prop("choice_main_menu.prop","selected")=="3" then
+	ini_set("text_next", "Return  ");
+	ini_set("icon_next", "@home");
+	textbox(
+		"Credits",
+		"Thanks and credits for Partition Manager",
+		"@credits",
+		read("/tmp/aroma/credits.txt")
+	);
+	goto("start");
+endif;
+
+###################
+### Exit
+###################
+
+if prop("choice_main_menu.prop","selected")=="4" then
+	exit("");
+endif;
+
+###################
+### Installation
+###################
+
+if prop("choice_main_menu.prop", "selected") == "1" then
+	# cache the partition status value for install process
+	write("/tmp/partition_status", getvar("partition_status"));
+
+	ini_set("text_next", "Reboot TWRP");
+	ini_set("icon_next", "@exit");
+	setvar("retstatus",
+		install(
+			"Repartitioning",
+			"<b>" + "Partition Manager" + "</b> is performing the repartition.\n\n"+
+			"This may take a minute.",
+			"@chip",
+			""
+		)
+	);
+	write("/tmp/do_reboot_recovery", "");
+endif;
+
+exit("");
