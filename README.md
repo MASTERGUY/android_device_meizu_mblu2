@@ -25,5 +25,10 @@ To initialize your local repository using the OMNIROM trees to build SHRP, use a
 *lunch omni_mblu2-eng*
 
 *mka recoveryimage*
-  
+
+**Partition Manager**
+
+Contexts of Partition Manager is added in P.Managercontexts file please read i and follow it in sources
+
+
 ### [Guide For Other Devices](https://skyhawk-recovery-project.github.io/#/guide) to Build SHRP 
