@@ -30,5 +30,10 @@ To initialize your local repository using the OMNIROM trees to build SHRP, use a
 
 Contexts of Partition Manager is added in P.Managercontexts file please read i and follow it in sources
 
+**How to make x32 shrp?**
+
+Just go to AndroidProducts.mk and change "MBLU2_32_BUILD :=" to true
+
+*Note to revert back on x64 just change "MBLU2_32_BUILD :=" to false*
 
 ### [Guide For Other Devices](https://skyhawk-recovery-project.github.io/#/guide) to Build SHRP 
