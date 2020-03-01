@@ -66,6 +66,9 @@ endif
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 50331648
 BOARD_FLASH_BLOCK_SIZE := 131072
 
+#Ignore Missing Dependencies
+ALLOW_MISSING_DEPENDENCIES=true
+
 # Recovery
 TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/recovery/root/etc/twrp.stock
 TW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID := true
@@ -79,15 +82,20 @@ TW_THEME := portrait_hdpi
 TW_USE_TOOLBOX := true
 # SHRP Configuration
 SHRP_MAINTAINER := Murtaza1326
-SHRP_DEVICE_CODE := MBlu2
+SHRP_DEVICE_CODE := mblu2
 SHRP_EDL_MODE := 0
 SHRP_EXTERNAL := /external_sd
 SHRP_INTERNAL := /sdcard
 SHRP_OTG := /usb-otg
+SHRP_CUSTOM_FLASHLIGHT := true
 SHRP_FLASH := 1
-SHRP_FLASH_MAX_BRIGHTNESS := 1
+SHRP_FLASH_MAX_BRIGHTNESS := 200
 SHRP_FONP_1 := /proc/torch
-SHRP_FONP_2 :=
-SHRP_FONP_3 := 
+SHRP_FONP_2 := /proc/torch
+SHRP_FONP_3 := /proc/torch
 SHRP_REC := /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/recovery
 SHRP_AB := false 
+# Recovery Type (It can be treble,normal,SAR) [Only for About Section]
+SHRP_REC_TYPE := Treble
+# Recovery Type (It can be A/B or A_only) [Only for About Section]
+SHRP_DEVICE_TYPE := A_Only
